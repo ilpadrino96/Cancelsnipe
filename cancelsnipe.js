@@ -1,102 +1,109 @@
 (() => {
   // Remove if already exists
   const oldUI = document.getElementById('snipeUIConsole');
-  if(oldUI) oldUI.remove();
+  if (oldUI) oldUI.remove();
 
-  // Add styles
   const style = document.createElement('style');
   style.textContent = `
     #snipeUIConsole {
       position: fixed;
       top: 100px;
       left: 100px;
-      background: #f4f4f4;
-      border: 2px solid #888;
-      border-radius: 10px;
-      padding: 12px 15px;
+      background: #121212;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 8px 10px;
       z-index: 999999;
       font-family: monospace;
-      color: #000;
-      width: 280px;
+      color: #eee;
+      width: 240px;
       user-select: none;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 0 8px #00ffff88;
       cursor: move;
+      font-size: 12px;
     }
     #snipeUIConsole label {
       display: block;
-      margin-top: 8px;
-      font-weight: bold;
+      margin-top: 6px;
+      font-weight: 600;
+      user-select: text;
+      color: #ccc;
     }
     #snipeUIConsole input[type="text"] {
       width: 100%;
       font-family: monospace;
-      font-size: 14px;
-      padding: 4px 6px;
+      font-size: 12px;
+      padding: 3px 5px;
       box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 1px solid #555;
+      border-radius: 3px;
       margin-top: 2px;
+      background: #222;
+      color: #eee;
+    }
+    #snipeUIConsole input[type="text"]::placeholder {
+      color: #666;
     }
     #snipeUIConsole div.countdown {
-      font-size: 16px;
-      margin-top: 6px;
-      color: #222;
-      background: #ddd;
-      border-radius: 5px;
-      padding: 6px 8px;
+      font-size: 14px;
+      margin-top: 4px;
+      color: #0ff;
+      background: #222;
+      border-radius: 4px;
+      padding: 4px 6px;
       text-align: center;
       user-select: text;
+      font-weight: 700;
     }
     #snipeUIConsole .buttons-row {
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: space-between;
     }
     #snipeUIConsole button {
-      background: none;
-      border: none;
-      padding: 2px 6px;
-      font-size: 14px;
-      font-weight: 600;
+      background: transparent;
+      border: 1px solid #0ff;
+      padding: 3px 6px;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
-      color: #007bff;
+      color: #0ff;
       user-select: none;
-      border-radius: 3px;
-      transition: color 0.2s ease;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, color 0.2s ease;
       flex: 1;
     }
     #snipeUIConsole button:hover {
-      text-decoration: underline;
-      color: #0056b3;
+      background-color: #0ff;
+      color: #121212;
     }
   `;
   document.head.appendChild(style);
 
-  // Create container
   const container = document.createElement('div');
   container.id = 'snipeUIConsole';
   container.innerHTML = `
-    <label>🎯 Arrival: <input type="text" id="arrivalInput" placeholder="HH:mm:ss:ms" value="09:22:00:120" /></label>
-    <label>🚀 Launch time: <div id="launchTime" style="min-height:20px; margin-top:4px;"></div></label>
-    <label>🛑 Cancel time: <div id="cancelTime" style="min-height:20px; margin-top:4px;"></div></label>
+    <label>🎯 Arrival: <input type="text" id="arrivalInput" placeholder="HH:mm:ss:ms" value="14:30:00:120" /></label>
+    <label>🚀 Launch time: <div id="launchTime" style="min-height:18px; margin-top:2px;"></div></label>
+    <label>🛑 Cancel time: <div id="cancelTime" style="min-height:18px; margin-top:2px;"></div></label>
     <label>🚀 Launch countdown: <div id="launchCountdown" class="countdown">00:00:00:000</div></label>
     <label>⏳ Cancel countdown: <div id="cancelCountdown" class="countdown">00:00:00:000</div></label>
     <div class="buttons-row">
       <button id="startBtn">▶️ Start</button>
       <button id="pauseBtn">⏸ Pause</button>
-      <button id="copyCancelBtn">📋 Copy Cancel Time</button>
+      <button id="copyCancelBtn">📋 Copy</button>
       <button id="resetBtn">🔄 Reset</button>
     </div>
   `;
   document.body.appendChild(container);
 
-  // Make draggable
+  // Drag functionality (same as before)
   (() => {
-    let pos = {top: 0, left: 0, x: 0, y: 0};
+    let pos = { top: 0, left: 0, x: 0, y: 0 };
     const el = container;
 
-    const mouseDownHandler = function(e) {
+    const mouseDownHandler = function (e) {
       pos = {
         left: el.offsetLeft,
         top: el.offsetTop,
@@ -108,13 +115,13 @@
       el.style.cursor = 'grabbing';
       el.style.userSelect = 'none';
     };
-    const mouseMoveHandler = function(e) {
+    const mouseMoveHandler = function (e) {
       const dx = e.clientX - pos.x;
       const dy = e.clientY - pos.y;
       el.style.left = `${pos.left + dx}px`;
       el.style.top = `${pos.top + dy}px`;
     };
-    const mouseUpHandler = function() {
+    const mouseUpHandler = function () {
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
       el.style.cursor = 'move';
@@ -123,7 +130,6 @@
     el.addEventListener('mousedown', mouseDownHandler);
   })();
 
-  // Elements
   const arrivalInput = container.querySelector('#arrivalInput');
   const launchTimeEl = container.querySelector('#launchTime');
   const cancelTimeEl = container.querySelector('#cancelTime');
@@ -135,148 +141,119 @@
   const copyCancelBtn = container.querySelector('#copyCancelBtn');
   const resetBtn = container.querySelector('#resetBtn');
 
-  // Sounds (simple beep tone data URI)
   const beepLaunch = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAACQ=");
   const beepCancel = new Audio("data:audio/wav;base64,UklGRkIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAA==");
 
   function playBeep(type) {
-    if(type === 'launch') {
+    if (type === 'launch') {
       beepLaunch.currentTime = 0;
-      beepLaunch.play().catch(() => {});
-    } else if(type === 'cancel') {
+      beepLaunch.play().catch(() => { });
+    } else {
       beepCancel.currentTime = 0;
-      beepCancel.play().catch(() => {});
+      beepCancel.play().catch(() => { });
     }
   }
 
-  // Parsing arrival time string HH:mm:ss:ms
   function parseTimeString(str) {
     const parts = str.trim().split(':');
-    if(parts.length < 3) return null;
-    let [h,m,s,ms] = parts;
+    if (parts.length < 3) return null;
+    let [h, m, s, ms] = parts;
     h = parseInt(h); m = parseInt(m); s = parseInt(s); ms = ms ? parseInt(ms) : 0;
-    if([h,m,s,ms].some(n => isNaN(n))) return null;
-    if(h<0||h>23||m<0||m>59||s<0||s>59||ms<0||ms>999) return null;
+    if ([h, m, s, ms].some(n => isNaN(n))) return null;
     const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h,m,s,ms);
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, ms);
   }
 
-  // Formatting helpers
   function formatTimeWithMs(date) {
-    const hh = String(date.getHours()).padStart(2,'0');
-    const mm = String(date.getMinutes()).padStart(2,'0');
-    const ss = String(date.getSeconds()).padStart(2,'0');
-    const ms = String(date.getMilliseconds()).padStart(3,'0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    const ms = String(date.getMilliseconds()).padStart(3, '0');
     return `${hh}:${mm}:${ss}:${ms}`;
   }
   function formatTimeNoMs(date) {
-    const hh = String(date.getHours()).padStart(2,'0');
-    const mm = String(date.getMinutes()).padStart(2,'0');
-    const ss = String(date.getSeconds()).padStart(2,'0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
     return `${hh}:${mm}:${ss}`;
   }
   function formatCountdown(ms) {
-    if(ms < 0) ms = 0;
-    const h = Math.floor(ms/3600000);
-    ms -= h*3600000;
-    const m = Math.floor(ms/60000);
-    ms -= m*60000;
-    const s = Math.floor(ms/1000);
-    ms -= s*1000;
-    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}:${String(ms).padStart(3,'0')}`;
+    if (ms < 0) ms = 0;
+    const h = Math.floor(ms / 3600000);
+    ms -= h * 3600000;
+    const m = Math.floor(ms / 60000);
+    ms -= m * 60000;
+    const s = Math.floor(ms / 1000);
+    ms -= s * 1000;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}:${String(ms).padStart(3, '0')}`;
   }
 
-  // Calculate launch & cancel times given arrival, reaction time 10s, max snipe window 8 mins (480s)
   function calculateTimes(arrivalDate) {
-    const reactionMs = 10_000; // 10 seconds in ms
-    const maxSnipeMs = 480_000; // 8 minutes in ms
-
+    const reactionMs = 10_000;
+    const maxSnipeMs = 480_000;
     const now = new Date();
-
-    // Time difference between now and arrival in ms
     let diff = arrivalDate - now;
-
-    // Max available snipe window:
-    // If diff > maxSnipeMs + reactionMs, use maxSnipeMs
-    // else round down diff - reactionMs to nearest even number and split
     let snipeWindowMs;
-    if(diff > maxSnipeMs + reactionMs) {
+    if (diff > maxSnipeMs + reactionMs) {
       snipeWindowMs = maxSnipeMs;
     } else {
       let available = diff - reactionMs;
-      if(available <= 0) snipeWindowMs = 0;
-      else snipeWindowMs = 2 * Math.floor(available/2);
+      snipeWindowMs = available <= 0 ? 0 : 2 * Math.floor(available / 2);
     }
-
-    // Launch time = arrival - snipeWindowMs + 10 ms (minimum)
-    let launchTimeMs = arrivalDate.getTime() - snipeWindowMs + 10;
-    if(launchTimeMs > arrivalDate.getTime()) launchTimeMs = arrivalDate.getTime();
-
-    // Cancel time = halfway between launch and arrival, rounded to seconds (no ms)
+    let launchTimeMs = arrivalDate.getTime() - snipeWindowMs + 20;
+    if (launchTimeMs > arrivalDate.getTime()) launchTimeMs = arrivalDate.getTime();
     const cancelTimeMs = Math.round((launchTimeMs + arrivalDate.getTime()) / 2 / 1000) * 1000;
-
     return {
       launch: new Date(launchTimeMs),
       cancel: new Date(cancelTimeMs),
     };
   }
 
-  // State
   let times = null;
   let timer = null;
   let paused = false;
+  let countdownStarted = false;
 
-  // Update UI times and countdowns
   function updateDisplay() {
-    if(!times) return;
-
-    // Update times display
-    launchTimeEl.textContent = formatTimeWithMs(times.launch);
-    cancelTimeEl.textContent = formatTimeNoMs(times.cancel);
-
-    // Calculate countdowns
+    if (!times) return;
     const now = new Date();
     const launchDiff = times.launch - now;
     const cancelDiff = times.cancel - now;
+    if (launchDiff <= 0) countdownStarted = true;
 
-    // Launch countdown stops at zero
+    launchTimeEl.textContent = formatTimeWithMs(times.launch);
+    cancelTimeEl.textContent = formatTimeNoMs(times.cancel);
+
     launchCountdownEl.textContent = launchDiff > 0 ? formatCountdown(launchDiff) : '00:00:00:000';
+    cancelCountdownEl.textContent = countdownStarted ? formatCountdown(cancelDiff) : '00:00:00:000';
 
-    // Cancel countdown counts down normally, can be zero or negative
-    cancelCountdownEl.textContent = cancelDiff > 0 ? formatCountdown(cancelDiff) : '00:00:00:000';
-
-    // Beep on launch time (only once)
-    if(!paused && launchDiff <= 0 && !launchCountdownEl.classList.contains('beeped-launch')) {
+    if (!paused && launchDiff <= 0 && !launchCountdownEl.classList.contains('beeped-launch')) {
       playBeep('launch');
       launchCountdownEl.classList.add('beeped-launch');
     }
-
-    // Beep on cancel time (only once)
-    if(!paused && cancelDiff <= 0 && !cancelCountdownEl.classList.contains('beeped-cancel')) {
+    if (!paused && cancelDiff <= 0 && !cancelCountdownEl.classList.contains('beeped-cancel')) {
       playBeep('cancel');
       cancelCountdownEl.classList.add('beeped-cancel');
     }
   }
 
   function startTimer() {
-    if(timer) clearInterval(timer);
+    if (timer) clearInterval(timer);
     paused = false;
+    countdownStarted = false;
     launchCountdownEl.classList.remove('beeped-launch');
     cancelCountdownEl.classList.remove('beeped-cancel');
 
-    // Parse input arrival
     const arrivalDate = parseTimeString(arrivalInput.value);
-    if(!arrivalDate) {
-      alert('Invalid arrival time format. Use HH:mm:ss:ms');
+    if (!arrivalDate) {
+      alert('Invalid arrival time. Use HH:mm:ss:ms');
       return;
     }
-
     times = calculateTimes(arrivalDate);
-
     updateDisplay();
 
     timer = setInterval(() => {
-      if(!paused) updateDisplay();
+      if (!paused) updateDisplay();
     }, 40);
   }
 
@@ -285,9 +262,10 @@
   }
 
   function resetTimer() {
-    if(timer) clearInterval(timer);
+    if (timer) clearInterval(timer);
     timer = null;
     paused = false;
+    countdownStarted = false;
     times = null;
     launchTimeEl.textContent = '';
     cancelTimeEl.textContent = '';
@@ -298,7 +276,7 @@
   }
 
   function copyCancelTime() {
-    if(!times) return;
+    if (!times) return;
     const cancelStr = formatTimeNoMs(times.cancel);
     navigator.clipboard.writeText(cancelStr).then(() => {
       alert(`Cancel time copied: ${cancelStr}`);
@@ -307,10 +285,8 @@
     });
   }
 
-  // Button listeners
   startBtn.onclick = () => startTimer();
   pauseBtn.onclick = () => pauseTimer();
   resetBtn.onclick = () => resetTimer();
   copyCancelBtn.onclick = () => copyCancelTime();
-
 })();
