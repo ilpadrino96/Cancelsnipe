@@ -202,15 +202,22 @@
     snipeWindowMs = available <= 0 ? 0 : 2 * Math.floor(available / 2);
   }
 
-  // Calculate launch time ms as arrival - snipeWindow
+  // Calculate initial launchTimeMs
   let launchTimeMs = arrivalDate.getTime() - snipeWindowMs;
-  
-  // Now set launchTime ms milliseconds exactly to arrival ms + 20
+
+  // Adjust launchTimeMs so (arrivalDate - launchTimeMs) divisible by 2000 (2 seconds)
+  const totalTravelMs = arrivalDate.getTime() - launchTimeMs;
+  const remainder = totalTravelMs % 2000;
+  if (remainder !== 0) {
+    launchTimeMs += remainder; // Move launchTime forward to nearest divisible by 2000 travel time
+  }
+
+  // Set launch milliseconds = arrival ms + 20 (mod 1000)
   const arrivalMs = arrivalDate.getMilliseconds();
   const launchDate = new Date(launchTimeMs);
   launchDate.setMilliseconds((arrivalMs + 20) % 1000);
 
-  // Calculate cancel time as midpoint between launch and arrival, rounded to seconds
+  // Cancel time is midpoint between launch and arrival, rounded to nearest second
   const cancelTimeMs = Math.round((launchDate.getTime() + arrivalDate.getTime()) / 2 / 1000) * 1000;
 
   return {
@@ -218,6 +225,7 @@
     cancel: new Date(cancelTimeMs),
   };
 }
+
 
 
   let times = null;
