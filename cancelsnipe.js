@@ -10,7 +10,7 @@
       top: 100px;
       left: 100px;
       background: #121212;
-      border: 1px solid #444;
+      border: 1px solid #5a3e1b;
       border-radius: 6px;
       padding: 8px 10px;
       z-index: 999999;
@@ -18,7 +18,7 @@
       color: #eee;
       width: 240px;
       user-select: none;
-      box-shadow: 0 0 8px #00ffff88;
+      box-shadow: 0 0 8px #a4713f88;
       cursor: move;
       font-size: 12px;
     }
@@ -27,7 +27,7 @@
       margin-top: 6px;
       font-weight: 600;
       user-select: text;
-      color: #ccc;
+      color: #d6b87a;
     }
     #snipeUIConsole input[type="text"] {
       width: 100%;
@@ -35,20 +35,20 @@
       font-size: 12px;
       padding: 3px 5px;
       box-sizing: border-box;
-      border: 1px solid #555;
+      border: 1px solid #6d4b21;
       border-radius: 3px;
       margin-top: 2px;
-      background: #222;
-      color: #eee;
+      background: #2a1f0b;
+      color: #f3e4b7;
     }
     #snipeUIConsole input[type="text"]::placeholder {
-      color: #666;
+      color: #8b6b3e;
     }
     #snipeUIConsole div.countdown {
       font-size: 14px;
       margin-top: 4px;
-      color: #0ff;
-      background: #222;
+      color: #b58934;
+      background: #2a1f0b;
       border-radius: 4px;
       padding: 4px 6px;
       text-align: center;
@@ -63,19 +63,19 @@
     }
     #snipeUIConsole button {
       background: transparent;
-      border: 1px solid #0ff;
+      border: 1px solid #a4713f;
       padding: 3px 6px;
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      color: #0ff;
+      color: #a4713f;
       user-select: none;
       border-radius: 4px;
       transition: background-color 0.2s ease, color 0.2s ease;
       flex: 1;
     }
     #snipeUIConsole button:hover {
-      background-color: #0ff;
+      background-color: #a4713f;
       color: #121212;
     }
   `;
