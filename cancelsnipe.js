@@ -189,25 +189,36 @@
   }
 
   function calculateTimes(arrivalDate) {
-    const reactionMs = 10_000;
-    const maxSnipeMs = 480_000;
-    const now = new Date();
-    let diff = arrivalDate - now;
-    let snipeWindowMs;
-    if (diff > maxSnipeMs + reactionMs) {
-      snipeWindowMs = maxSnipeMs;
-    } else {
-      let available = diff - reactionMs;
-      snipeWindowMs = available <= 0 ? 0 : 2 * Math.floor(available / 2);
-    }
-    let launchTimeMs = arrivalDate.getTime() - snipeWindowMs + 20;
-    if (launchTimeMs > arrivalDate.getTime()) launchTimeMs = arrivalDate.getTime();
-    const cancelTimeMs = Math.round((launchTimeMs + arrivalDate.getTime()) / 2 / 1000) * 1000;
-    return {
-      launch: new Date(launchTimeMs),
-      cancel: new Date(cancelTimeMs),
-    };
+  const reactionMs = 10_000;
+  const maxSnipeMs = 480_000;
+  const now = new Date();
+  let diff = arrivalDate - now;
+  let snipeWindowMs;
+
+  if (diff > maxSnipeMs + reactionMs) {
+    snipeWindowMs = maxSnipeMs;
+  } else {
+    let available = diff - reactionMs;
+    snipeWindowMs = available <= 0 ? 0 : 2 * Math.floor(available / 2);
   }
+
+  // Calculate launch time ms as arrival - snipeWindow
+  let launchTimeMs = arrivalDate.getTime() - snipeWindowMs;
+  
+  // Now set launchTime ms milliseconds exactly to arrival ms + 20
+  const arrivalMs = arrivalDate.getMilliseconds();
+  const launchDate = new Date(launchTimeMs);
+  launchDate.setMilliseconds((arrivalMs + 20) % 1000);
+
+  // Calculate cancel time as midpoint between launch and arrival, rounded to seconds
+  const cancelTimeMs = Math.round((launchDate.getTime() + arrivalDate.getTime()) / 2 / 1000) * 1000;
+
+  return {
+    launch: launchDate,
+    cancel: new Date(cancelTimeMs),
+  };
+}
+
 
   let times = null;
   let timer = null;
