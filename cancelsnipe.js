@@ -84,11 +84,12 @@
   const container = document.createElement('div');
   container.id = 'snipeUIConsole';
   container.innerHTML = `
-    <label>🎯 Arrival: <input type="text" id="arrivalInput" placeholder="HH:mm:ss:ms" value="14:30:00:120" /></label>
+    <label>  🎯 Arrival:<input type="text" id="arrivalInput" placeholder="HH:mm:ss" value="14:30:00" />
+  <span id="errorMsg" style="display:none; color: red; font-size: 12px; font-weight: bold;">🔴 Invalid or past time</span></label>
     <label>🚀 Launch time: <div id="launchTime" style="min-height:18px; margin-top:2px;"></div></label>
     <label>🛑 Cancel time: <div id="cancelTime" style="min-height:18px; margin-top:2px;"></div></label>
-    <label>🚀 Launch countdown: <div id="launchCountdown" class="countdown">00:00:00:000</div></label>
-    <label>⏳ Cancel countdown: <div id="cancelCountdown" class="countdown">00:00:00:000</div></label>
+    <label>🚀 Launch countdown: <div id="launchCountdown" class="countdown">00:00:00</div></label>
+    <label>⏳ Cancel countdown: <div id="cancelCountdown" class="countdown">00:00:00</div></label>
     <div class="buttons-row">
       <button id="startBtn">▶️ Start</button>
       <button id="pauseBtn">⏸ Pause</button>
@@ -178,15 +179,14 @@
     return `${hh}:${mm}:${ss}`;
   }
   function formatCountdown(ms) {
-    if (ms < 0) ms = 0;
-    const h = Math.floor(ms / 3600000);
-    ms -= h * 3600000;
-    const m = Math.floor(ms / 60000);
-    ms -= m * 60000;
-    const s = Math.floor(ms / 1000);
-    ms -= s * 1000;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}:${String(ms).padStart(3, '0')}`;
-  }
+  if (ms < 0) ms = 0;
+  const h = Math.floor(ms / 3600000);
+  ms -= h * 3600000;
+  const m = Math.floor(ms / 60000);
+  ms -= m * 60000;
+  const s = Math.floor(ms / 1000);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
 
   function calculateTimes(arrivalDate) {
   const reactionMs = 10_000;
@@ -243,8 +243,8 @@
     launchTimeEl.textContent = formatTimeWithMs(times.launch);
     cancelTimeEl.textContent = formatTimeNoMs(times.cancel);
 
-    launchCountdownEl.textContent = launchDiff > 0 ? formatCountdown(launchDiff) : '00:00:00:000';
-    cancelCountdownEl.textContent = countdownStarted ? formatCountdown(cancelDiff) : '00:00:00:000';
+    launchCountdownEl.textContent = launchDiff > 0 ? formatCountdown(launchDiff) : '00:00:00';
+    cancelCountdownEl.textContent = countdownStarted ? formatCountdown(cancelDiff) : '00:00:00';
 
     if (!paused && launchDiff <= 0 && !launchCountdownEl.classList.contains('beeped-launch')) {
       playBeep('launch');
@@ -263,11 +263,16 @@
     launchCountdownEl.classList.remove('beeped-launch');
     cancelCountdownEl.classList.remove('beeped-cancel');
 
-    const arrivalDate = parseTimeString(arrivalInput.value);
-    if (!arrivalDate) {
-      alert('Invalid arrival time. Use HH:mm:ss:ms');
-      return;
-    }
+    const errorMsg = document.getElementById('errorMsg');
+errorMsg.style.display = 'none';
+
+const arrivalDate = parseTimeString(arrivalInput.value);
+const now = new Date();
+
+if (!arrivalDate || arrivalDate <= now) {
+  errorMsg.style.display = 'inline-block';
+  return;
+}
     times = calculateTimes(arrivalDate);
     updateDisplay();
 
@@ -288,8 +293,8 @@
     times = null;
     launchTimeEl.textContent = '';
     cancelTimeEl.textContent = '';
-    launchCountdownEl.textContent = '00:00:00:000';
-    cancelCountdownEl.textContent = '00:00:00:000';
+    launchCountdownEl.textContent = '00:00:00';
+    cancelCountdownEl.textContent = '00:00:00';
     launchCountdownEl.classList.remove('beeped-launch');
     cancelCountdownEl.classList.remove('beeped-cancel');
   }
